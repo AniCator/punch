@@ -15,6 +15,14 @@ build/
 [Bb]in/
 [Oo]bj/
 
+!src/thirdparty/
+!src/thirdparty/*
+!src/thirdparty/glew190/*
+!src/thirdparty/glew190/bin/*
+!src/thirdparty/glew190/lib/*
+!src/thirdparty/glfw-3.0.3.bin.WIN32/*
+!src/thirdparty/glfw-3.0.3.bin.WIN32/lib-msvc100*
+
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
 
