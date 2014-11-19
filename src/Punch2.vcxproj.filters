@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Application">
+      <UniqueIdentifier>{4b2e01e2-a0d7-41fa-940b-00d56a56ebd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MusicModule">
+      <UniqueIdentifier>{90d1d05d-ee9b-46f5-be43-baff47f4e630}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{88a84886-7125-4f71-b14d-489f4bebc8dd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="appframework\PunchApplication.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="musicmodule\MusicModule.cpp">
+      <Filter>MusicModule</Filter>
+    </ClCompile>
+    <ClCompile Include="musicmodule\BASSModule.cpp">
+      <Filter>MusicModule</Filter>
+    </ClCompile>
+    <ClCompile Include="Vis_TestLayer1.h">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Vis_TestLayer1.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="VisLayer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Vis_Spectrum.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Vis_Various.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="appframework\PunchApplication.h">
+      <Filter>Application</Filter>
+    </ClInclude>
+    <ClInclude Include="musicmodule\MusicModule.h">
+      <Filter>MusicModule</Filter>
+    </ClInclude>
+    <ClInclude Include="musicmodule\BASSModule.h">
+      <Filter>MusicModule</Filter>
+    </ClInclude>
+    <ClInclude Include="appframework\errordefs.h" />
+    <ClInclude Include="util\util.h" />
+    <ClInclude Include="VisLayer.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerManager.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Vis_Spectrum.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Vis_Layers.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Vis_Various.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
