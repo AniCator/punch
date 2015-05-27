@@ -1,4 +1,7 @@
+#pragma once
 #include "glm.hpp"
+
+#include <string>
 
 inline glm::vec3 Lerp(glm::vec3 start, glm::vec3 end, float amount)
 {
@@ -8,4 +11,16 @@ inline glm::vec3 Lerp(glm::vec3 start, glm::vec3 end, float amount)
 inline float Lerp(float start, float end, float amount)
 {
 	return (start + amount * (end - start));
+}
+
+inline std::string ExePath()
+{
+#ifdef _WIN32
+	char buffer[MAX_PATH];
+	GetModuleFileName( NULL, buffer, MAX_PATH );
+	std::string::size_type pos = std::string( buffer ).find_last_of( "\\/" );
+	return std::string( buffer ).substr( 0, pos );
+#else
+	#error Unsupported platform for ExePath().
+#endif
 }

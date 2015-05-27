@@ -6,6 +6,7 @@ char **g_argv;
 
 CMusicModule* CPunchApplication::m_pMusicModule = NULL;
 CLayerManager* CPunchApplication::m_pLayerManager = NULL;
+CConfigurationManager* CPunchApplication::m_pConfigurationManager = NULL;
 
 CPunchApplication::CPunchApplication()
 {
@@ -23,6 +24,10 @@ void CPunchApplication::Initialize()
 	InitializeGLEW();
 	InitializeMusicModule();
 	InitializeLayerManager();
+
+	std::stringstream filePath;
+	filePath << ExePath() << "/Punch2.ini";
+	m_pConfigurationManager = new CConfigurationManager( filePath.str().c_str() );
 }
 
 void CPunchApplication::InitializeMusicModule()

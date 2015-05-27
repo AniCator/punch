@@ -36,6 +36,9 @@
     <ClCompile Include="Vis_Various.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="ConfigurationManager.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="appframework\PunchApplication.h">
@@ -66,6 +69,9 @@
     </ClInclude>
     <ClInclude Include="Vis_TestLayer1.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationManager.h">
+      <Filter>Application</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

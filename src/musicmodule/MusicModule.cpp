@@ -10,6 +10,11 @@ CMusicModule::~CMusicModule()
 
 }
 
+int CMusicModule::GetSupportFlags()
+{
+	return m_eSupportFlags;
+}
+
 void CMusicModule::PlaylistAddItem(std::string szItemLocation)
 {
 	szPlaylist.push_back(szItemLocation);

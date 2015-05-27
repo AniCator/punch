@@ -19,11 +19,15 @@
 #include <iostream>
 #include <algorithm>
 #include <array>
+#include <string>
+#include <sstream>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "errordefs.h"
 #include "util/util.h"
+
+#include "ConfigurationManager.h"
 #include "musicmodule/BASSModule.h"
 #include "LayerManager.h"
 
@@ -81,4 +85,5 @@ private:
 
 	static CMusicModule* m_pMusicModule;
 	static CLayerManager* m_pLayerManager;
+	static CConfigurationManager* m_pConfigurationManager;
 };

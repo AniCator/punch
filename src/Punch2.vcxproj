@@ -78,6 +78,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="appframework\PunchApplication.cpp" />
+    <ClCompile Include="ConfigurationManager.cpp" />
     <ClCompile Include="LayerManager.cpp" />
     <ClCompile Include="musicmodule\BASSModule.cpp" />
     <ClCompile Include="musicmodule\MusicModule.cpp" />
@@ -89,6 +90,7 @@
   <ItemGroup>
     <ClInclude Include="appframework\errordefs.h" />
     <ClInclude Include="appframework\PunchApplication.h" />
+    <ClInclude Include="ConfigurationManager.h" />
     <ClInclude Include="LayerManager.h" />
     <ClInclude Include="musicmodule\BASSModule.h" />
     <ClInclude Include="musicmodule\MusicModule.h" />

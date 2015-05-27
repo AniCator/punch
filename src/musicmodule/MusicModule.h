@@ -13,6 +13,11 @@ struct FFT_DataArray
 	float fft_data[FFT_DATAARRAY_SIZE];
 };
 
+enum ESupportFlag
+{
+	USE_INPUT_DEVICES,
+};
+
 class CMusicModule
 {
 public:
@@ -23,6 +28,9 @@ public:
 	virtual int Initialize() = 0;
 
 	virtual void Think() = 0;
+
+	//Support flag functions
+	virtual int GetSupportFlags();
 
 	//Playback functions
 	virtual void MusicPlay() = 0;
@@ -48,6 +56,8 @@ public:
 	virtual bool HasEnded() = 0;
 protected:
 	std::vector<std::string>	szPlaylist;
+
+	int m_eSupportFlags;
 private:
 	//
 };
