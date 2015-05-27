@@ -172,17 +172,8 @@ void CPunchApplication::HandleLogic()
 	}
 }
 
-unsigned int iUnfocusedDrawController = 0;
 void CPunchApplication::HandleDraw()
 {
-	// Check if window is focused
-	if (!glfwGetWindowAttrib(m_pAppWindow, GLFW_FOCUSED))
-	{
-		iUnfocusedDrawController++;
-		if(iUnfocusedDrawController % 2 != 0)
-			return;
-	}
-
 	// Draw scene
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
