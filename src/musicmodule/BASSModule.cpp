@@ -8,6 +8,8 @@ int CBASSModule::Initialize()
 		return APP_ERROR_BASS_INIT;
 	}
 
+	LoadPlugins();
+
 	return APP_ERROR_NONE;
 }
 
@@ -26,6 +28,19 @@ void CBASSModule::Think()
 			flFFT_DataArray.fft_data[i] /= 50.0f;
 		}
 	}
+}
+
+void CBASSModule::LoadPlugins()
+{
+	printf( "Loading plugins.\n" );
+	//Load FLAC library
+#ifdef _WIN32
+	BASS_PluginLoad( "bassflac.dll", 0 );
+	if( BASS_ErrorGetCode() != 0 )
+	{
+		printf( "Could not load FLAC plugin. Error: %i\n", BASS_ErrorGetCode() );
+	}
+#endif
 }
 
 //Playback functions
@@ -94,7 +109,18 @@ void CBASSModule::MusicPlayNextItem()
 	MusicLoad();
 	MusicPlay();
 
-	printf("Playing: %s\n",szPlaylist[iCurrentItemIdx]);
+	printf( "Playing: %s\n", szPlaylist[iCurrentItemIdx] );
+}
+
+void CBASSModule::MusicPlayItemAtIndex( unsigned int itemIndex )
+{
+	iCurrentItemIdx = max( 0, min( itemIndex, szPlaylist.size() ) );
+
+	MusicStop();
+	MusicLoad();
+	MusicPlay();
+
+	printf( "Playing: %s\n", szPlaylist[iCurrentItemIdx] );
 }
 
 //Returns FFT data array

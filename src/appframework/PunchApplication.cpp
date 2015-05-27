@@ -70,7 +70,7 @@ void CPunchApplication::InitializeLayerManager()
 
 void CPunchApplication::PopulatePlaylist()
 {
-#ifdef _WIN32
+#if 0
 	if(g_argc < 2)
 	{
 		printf("Error: No audio files added.\n");
@@ -127,7 +127,9 @@ void CPunchApplication::InitializeGLFW()
 	//Make window's context current
 	glfwMakeContextCurrent(m_pAppWindow);
 
-	glfwSetKeyCallback(m_pAppWindow,CPunchApplication::HandleKeyEvents);
+	glfwSetKeyCallback( m_pAppWindow, CPunchApplication::HandleKeyEvents );
+	glfwSetDropCallback( m_pAppWindow, CPunchApplication::HandlePathDrop );
+
 	glfwSwapInterval(0);
 }
 
@@ -146,13 +148,18 @@ void CPunchApplication::MainLoop()
 	while (!glfwWindowShouldClose(m_pAppWindow))
 	{
 		//Logic tick
-		if(GetDeltaTime() > (1.0/60.0))
+		if( GetDeltaTime() > 0.016667 )
 		{			
 			HandleLogic();
-			
-			HandleDraw();
 
 			UpdateDeltaTime();
+		}
+
+		if( GetDrawDeltaTime() > 0.00333 )
+		{
+			HandleDraw();
+
+			UpdateDrawDeltaTime();
 		}
 
 		//Poll events
@@ -202,12 +209,34 @@ void CPunchApplication::HandleKeyEvents(GLFWwindow* window, int key, int scancod
 	}
 }
 
+void CPunchApplication::HandlePathDrop( GLFWwindow* window, int count, const char** paths )
+{
+	for( int i = 0; i < count; i++ )
+	{
+		printf( "Adding dropped file to playlist: %s\n", paths[i] );
+		m_pMusicModule->PlaylistAddItem( paths[i] );
+	}
+
+	unsigned int itemIndex = m_pMusicModule->PlaylistSize() - count;
+	m_pMusicModule->MusicPlayItemAtIndex( itemIndex );
+}
+
 double CPunchApplication::GetDeltaTime()
+{
+	return glfwGetTime() - m_dTimeLastTick;
+}
+
+void CPunchApplication::UpdateDeltaTime()
+{
+	m_dTimeLastTick = glfwGetTime();
+}
+
+double CPunchApplication::GetDrawDeltaTime()
 {
 	return glfwGetTime() - m_dTimeLastFrame;
 }
 
-void CPunchApplication::UpdateDeltaTime()
+void CPunchApplication::UpdateDrawDeltaTime()
 {
 	m_dTimeLastFrame = glfwGetTime();
 }

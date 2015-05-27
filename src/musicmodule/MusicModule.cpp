@@ -19,3 +19,8 @@ void CMusicModule::PlaylistClear()
 {
 	szPlaylist.clear();
 }
+
+unsigned int CMusicModule::PlaylistSize()
+{
+	return szPlaylist.size();
+}

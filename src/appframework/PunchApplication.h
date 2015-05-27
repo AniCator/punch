@@ -67,10 +67,15 @@ private:
 	void HandleDraw();
 
 	static void HandleKeyEvents(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void HandlePathDrop( GLFWwindow* window, int count, const char** paths );
 
 	double	GetDeltaTime();
-	void		UpdateDeltaTime();
+	void	UpdateDeltaTime();
 
+	double	GetDrawDeltaTime();
+	void	UpdateDrawDeltaTime();
+
+	double m_dTimeLastTick;
 	double m_dTimeLastFrame;
 	GLFWwindow* m_pAppWindow;
 

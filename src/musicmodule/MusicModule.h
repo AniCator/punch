@@ -32,10 +32,12 @@ public:
 	//Playback functions - playlist related
 	virtual void MusicPlayPreviousItem() = 0;
 	virtual void MusicPlayNextItem() = 0;
+	virtual void MusicPlayItemAtIndex(unsigned int itemIndex) = 0;
 
 	//Playlist functions
 	virtual void PlaylistAddItem(std::string szItemLocation);
 	virtual void PlaylistClear();
+	virtual unsigned int PlaylistSize();
 
 	//Returns FFT data array
 	virtual FFT_DataArray GetFFTData() = 0;

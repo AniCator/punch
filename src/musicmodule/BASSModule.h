@@ -19,6 +19,7 @@ public:
 	//Playback functions - playlist related
 	virtual void MusicPlayPreviousItem();
 	virtual void MusicPlayNextItem();
+	virtual void MusicPlayItemAtIndex( unsigned int itemIndex );
 
 	//Returns FFT data array
 	virtual FFT_DataArray GetFFTData();
@@ -28,6 +29,8 @@ public:
 	virtual bool IsPaused();
 	virtual bool HasEnded();
 private:
+	void LoadPlugins();
+
 	void MusicLoad();
 
 	unsigned int				iCurrentItemIdx;
