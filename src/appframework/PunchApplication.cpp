@@ -28,6 +28,9 @@ void CPunchApplication::Initialize()
 	std::stringstream filePath;
 	filePath << ExePath() << "/Punch2.ini";
 	m_pConfigurationManager = new CConfigurationManager( filePath.str().c_str() );
+
+	UpdateDeltaTime();
+	UpdateDrawDeltaTime();
 }
 
 void CPunchApplication::InitializeMusicModule()
