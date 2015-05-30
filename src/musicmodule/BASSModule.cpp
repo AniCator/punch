@@ -88,10 +88,12 @@ int CALLBACK CBASSModule::RecordCallback( HRECORD handle, const void *buffer, DW
 
 void CBASSModule::RecordStart()
 {
+	printf( "--List of devices--\n" );
+
 	BASS_DEVICEINFO info;
 	for( int a = 0; BASS_RecordGetDeviceInfo( a, &info ); a++ )
 	{
-		if( info.flags & BASS_DEVICE_ENABLED ) // device is enabled
+		if( info.flags & BASS_DEVICE_ENABLED )
 		{
 			printf( "Device %i: %s\n", a, info.name );
 		}
@@ -100,7 +102,8 @@ void CBASSModule::RecordStart()
 	int nDevice = CConfigurationManager::GetInstance().GetInteger( "input_device" );
 	BASS_RecordInit( nDevice );
 
-	printf( "Device: %i\nError code: %i\n", nDevice, BASS_ErrorGetCode() );
+	BASS_RecordGetDeviceInfo( nDevice, &info );
+	printf( "\nListening to device: %s\n", info.name );
 
 	iStream = BASS_RecordStart( 44100, 2, MAKELONG( 0, 5 ), &CBASSModule::RecordCallback, this );
 }
@@ -162,7 +165,6 @@ void CBASSModule::MusicPlayItemAtIndex( unsigned int itemIndex )
 	printf( "Playing: %s\n", szPlaylist[iCurrentItemIdx] );
 }
 
-//Returns FFT data array
 FFT_DataArray CBASSModule::GetFFTData()
 {
 	return flFFT_DataArray;
