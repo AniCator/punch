@@ -8,6 +8,8 @@ int CBASSModule::Initialize()
 		return APP_ERROR_BASS_INIT;
 	}
 
+	m_eSupportFlags = USE_INPUT;
+
 	LoadPlugins();
 
 	return APP_ERROR_NONE;
@@ -69,6 +71,43 @@ void CBASSModule::MusicStop()
 {
 	if(iStream)
 		BASS_ChannelStop(iStream);
+}
+
+//Recording functions
+int CALLBACK CBASSModule::RecordCallback( HRECORD handle, const void *buffer, DWORD length, void *user )
+{
+	CBASSModule* module = reinterpret_cast< CBASSModule* >( user );
+	if( !module->iStream )
+		module->iStream = BASS_StreamCreate( 44100, 2, BASS_STREAM_DECODE, STREAMPROC_PUSH, NULL );
+
+	DWORD fftlen = min( length, 1024 * 2 * 2 ); // limit the data to the amount required by the FFT (1024 samples)
+	BASS_StreamPutData( module->iStream, buffer, fftlen );
+
+	return true;
+}
+
+void CBASSModule::RecordStart()
+{
+	BASS_DEVICEINFO info;
+	for( int a = 0; BASS_RecordGetDeviceInfo( a, &info ); a++ )
+	{
+		if( info.flags & BASS_DEVICE_ENABLED ) // device is enabled
+		{
+			printf( "Device %i: %s\n", a, info.name );
+		}
+	}
+
+	int nDevice = CConfigurationManager::GetInstance().GetInteger( "input_device" );
+	BASS_RecordInit( nDevice );
+
+	printf( "Device: %i\nError code: %i\n", nDevice, BASS_ErrorGetCode() );
+
+	iStream = BASS_RecordStart( 44100, 2, MAKELONG( 0, 5 ), &CBASSModule::RecordCallback, this );
+}
+
+void CBASSModule::RecordStop()
+{
+	BASS_RecordFree();
 }
 
 //Playback functions - playlist related

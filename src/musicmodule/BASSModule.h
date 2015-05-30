@@ -1,5 +1,6 @@
 #include "MusicModule.h"
 #include "bass.h"
+#include "ConfigurationManager.h"
 
 typedef int BASS_INT;
 
@@ -16,6 +17,11 @@ public:
 	virtual void MusicPause();
 	virtual void MusicStop();
 
+	//Recording functions
+	virtual void RecordStart();
+	virtual void RecordStop();
+	static BOOL CALLBACK RecordCallback( HRECORD handle, const void *buffer, DWORD length, void *user );
+
 	//Playback functions - playlist related
 	virtual void MusicPlayPreviousItem();
 	virtual void MusicPlayNextItem();
@@ -28,6 +34,8 @@ public:
 	virtual bool IsPlaying();
 	virtual bool IsPaused();
 	virtual bool HasEnded();
+
+	BASS_INT iStream;
 private:
 	void LoadPlugins();
 
@@ -35,6 +43,5 @@ private:
 
 	unsigned int				iCurrentItemIdx;
 
-	BASS_INT iStream;
 	FFT_DataArray flFFT_DataArray;
 };

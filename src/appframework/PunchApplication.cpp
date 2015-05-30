@@ -20,14 +20,14 @@ CPunchApplication::~CPunchApplication()
 
 void CPunchApplication::Initialize()
 {
+	std::stringstream filePath;
+	filePath << ExePath() << "/Punch2.ini";
+	CConfigurationManager::GetInstance().Initialize( filePath.str() );
+
 	InitializeGLFW();
 	InitializeGLEW();
 	InitializeMusicModule();
 	InitializeLayerManager();
-
-	std::stringstream filePath;
-	filePath << ExePath() << "/Punch2.ini";
-	m_pConfigurationManager = new CConfigurationManager( filePath.str().c_str() );
 
 	UpdateDeltaTime();
 	UpdateDrawDeltaTime();
@@ -49,8 +49,15 @@ void CPunchApplication::InitializeMusicModule()
 	if(m_pMusicModule->Initialize() == APP_ERROR_BASS_INIT)
 		Exit(APP_ERROR_BASS_INIT);
 
-	PopulatePlaylist();
-	m_pMusicModule->MusicPlayNextItem();
+	if( ( m_pMusicModule->GetSupportFlags() & ESupportFlag::USE_INPUT ) == 0 && CConfigurationManager::GetInstance().IsEnabled( "input_enabled" ))
+	{
+		m_pMusicModule->RecordStart();
+	}
+	else
+	{
+		PopulatePlaylist();
+		m_pMusicModule->MusicPlayNextItem();
+	}
 }
 
 
@@ -64,14 +71,14 @@ void CPunchApplication::InitializeLayerManager()
 
 	m_pLayerManager->AddLayer(new CVis_TestLayer1());
 
-	int iCount = 10;
+	/*int iCount = 10;
 	for(int i=1;i<=iCount;i++)
 	{
 		int iFreqStep = i * i * 4;
 		if(iFreqStep > FFT_DATAARRAY_SIZE)
 			break;
 		m_pLayerManager->AddLayer(new CVis_CubeWalking(iFreqStep));
-	}
+	}*/
 
 	m_pLayerManager->AddLayer(new CVis_Spectrum());
 }
@@ -106,25 +113,40 @@ void CPunchApplication::InitializeGLEW()
 
 void CPunchApplication::InitializeGLFW()
 {
+	bool bFullScreen = CConfigurationManager::GetInstance().IsEnabled( "fullscreen" );
+	bool bNoBorder = CConfigurationManager::GetInstance().IsEnabled( "noborder" );
+	int nWidth = CConfigurationManager::GetInstance().GetInteger( "width" );
+	int nHeight = CConfigurationManager::GetInstance().GetInteger( "height" );
+
 	//Initialize GLFW
 	if (!glfwInit())
 		Exit(APP_ERROR_GLFW_INIT);
 
 	//Window creation
 	glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
-#ifdef WINDOW_NO_BORDER
-	glfwWindowHint( GLFW_DECORATED, GL_FALSE ); //noborder
-#endif
+	if( bNoBorder )
+	{
+		glfwWindowHint( GLFW_DECORATED, GL_FALSE );
+	}
 
 	// Get monitor video mode properties
 	const GLFWvidmode* sVideoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-	
-	//m_pAppWindow = glfwCreateWindow(sVideoMode->width, sVideoMode->height, APP_WINDOW_TITLE, glfwGetPrimaryMonitor(), NULL); //fullscreen
-#ifdef WINDOW_HALF_SIZE
-	m_pAppWindow = glfwCreateWindow((int)(sVideoMode->width / 1.5), (int)(sVideoMode->height / 1.5), APP_WINDOW_TITLE, NULL, NULL);
-#else
-	m_pAppWindow = glfwCreateWindow(sVideoMode->width, sVideoMode->height, APP_WINDOW_TITLE, NULL, NULL);
-#endif
+
+	if( bFullScreen && !bNoBorder )
+	{
+		m_pAppWindow = glfwCreateWindow( sVideoMode->width, sVideoMode->height, APP_WINDOW_TITLE, glfwGetPrimaryMonitor(), NULL );
+	}
+	else
+	{
+		if( nWidth < 0 || nHeight < 0 )
+		{
+			m_pAppWindow = glfwCreateWindow( sVideoMode->width, sVideoMode->height, APP_WINDOW_TITLE, NULL, NULL );
+		}
+		else
+		{
+			m_pAppWindow = glfwCreateWindow( nWidth, nHeight, APP_WINDOW_TITLE, NULL, NULL );
+		}
+	}
 
 	if (!m_pAppWindow)
 	{
@@ -219,6 +241,9 @@ void CPunchApplication::HandleKeyEvents(GLFWwindow* window, int key, int scancod
 
 void CPunchApplication::HandlePathDrop( GLFWwindow* window, int count, const char** paths )
 {
+	if( CConfigurationManager::GetInstance().IsEnabled( "input_enabled" ) )
+		return;
+
 	for( int i = 0; i < count; i++ )
 	{
 		printf( "Adding dropped file to playlist: %s\n", paths[i] );

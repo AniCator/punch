@@ -15,7 +15,7 @@ struct FFT_DataArray
 
 enum ESupportFlag
 {
-	USE_INPUT_DEVICES,
+	USE_INPUT,
 };
 
 class CMusicModule
@@ -36,6 +36,10 @@ public:
 	virtual void MusicPlay() = 0;
 	virtual void MusicPause() = 0;
 	virtual void MusicStop() = 0;
+
+	//Recording functions
+	virtual void RecordStart() {};
+	virtual void RecordStop() {};
 
 	//Playback functions - playlist related
 	virtual void MusicPlayPreviousItem() = 0;
