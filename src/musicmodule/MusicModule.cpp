@@ -17,15 +17,15 @@ int CMusicModule::GetSupportFlags()
 
 void CMusicModule::PlaylistAddItem(std::string szItemLocation)
 {
-	szPlaylist.push_back(szItemLocation);
+	m_szPlaylist.push_back(szItemLocation);
 }
 
 void CMusicModule::PlaylistClear()
 {
-	szPlaylist.clear();
+	m_szPlaylist.clear();
 }
 
 unsigned int CMusicModule::PlaylistSize()
 {
-	return szPlaylist.size();
+	return m_szPlaylist.size();
 }

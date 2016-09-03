@@ -4,9 +4,10 @@
 int g_argc;
 char **g_argv;
 
-CMusicModule* CPunchApplication::m_pMusicModule = NULL;
-CLayerManager* CPunchApplication::m_pLayerManager = NULL;
-CConfigurationManager* CPunchApplication::m_pConfigurationManager = NULL;
+CMusicModule* CPunchApplication::MusicModuleInstance = NULL;
+CLayerManager* CPunchApplication::LayerManagerInstance = NULL;
+CConfigurationManager* CPunchApplication::ConfigurationManagerInstance = NULL;
+GLFWwindow* CPunchApplication::ApplicationWindow = NULL;
 
 CPunchApplication::CPunchApplication()
 {
@@ -36,9 +37,9 @@ void CPunchApplication::Initialize()
 void CPunchApplication::InitializeMusicModule()
 {
 	if(MUSIC_MODULE_TYPE == MM_BASS)
-		m_pMusicModule = new CBASSModule();
+		MusicModuleInstance = new CBASSModule();
 
-	if(!m_pMusicModule)
+	if(!MusicModuleInstance)
 	{
 		if(MUSIC_MODULE_TYPE == MM_UNDEFINED)
 			Exit(APP_ERROR_MUSIC_MODULE_UNDEFINED);
@@ -46,41 +47,42 @@ void CPunchApplication::InitializeMusicModule()
 			Exit(APP_ERROR_UNDEFINED);
 	}
 
-	if(m_pMusicModule->Initialize() == APP_ERROR_BASS_INIT)
+	if(MusicModuleInstance->Initialize() == APP_ERROR_BASS_INIT)
 		Exit(APP_ERROR_BASS_INIT);
 
-	if( ( m_pMusicModule->GetSupportFlags() & ESupportFlag::USE_INPUT ) == 0 && CConfigurationManager::GetInstance().IsEnabled( "input_enabled" ))
+	if( ( MusicModuleInstance->GetSupportFlags() & ESupportFlag::USE_INPUT ) == 0 && CConfigurationManager::GetInstance().IsEnabled( "input_enabled" ))
 	{
-		m_pMusicModule->RecordStart();
+		MusicModuleInstance->RecordStop();
+		MusicModuleInstance->RecordStart();
 	}
 	else
 	{
 		PopulatePlaylist();
-		m_pMusicModule->MusicPlayNextItem();
+		MusicModuleInstance->MusicPlayNextItem();
 	}
 }
 
 
 void CPunchApplication::InitializeLayerManager()
 {
-	m_pLayerManager = new CLayerManager();
+	LayerManagerInstance = new CLayerManager();
 
-	m_pLayerManager->AddLayer(new CVis_TestLayer1(0.1f, 0.5f, 0.2f, 3, SimpleColor(0.4f,0.6f,1.0f)));
-	m_pLayerManager->AddLayer(new CVis_TestLayer1(0.001f, 0.05f, 0.3f, 70, SimpleColor(1.0f,1.0f,1.0f)));
-	m_pLayerManager->AddLayer(new CVis_TestLayer1(0.05f, 0.2f, 0.12f, 30, SimpleColor(0.2f,1.0f,0.4f)));
+	LayerManagerInstance->AddLayer(new CVis_TestLayer1(0.1f, 0.5f, 0.2f, 3, SimpleColor(0.1f,0.3f,1.0f)));
+	LayerManagerInstance->AddLayer(new CVis_TestLayer1(0.001f, 0.05f, 0.3f, 70, SimpleColor(1.0f,1.0f,1.0f)));
+	LayerManagerInstance->AddLayer(new CVis_TestLayer1(0.05f, 0.2f, 0.12f, 30, SimpleColor(0.0f,1.0f,0.3f)));
 
-	m_pLayerManager->AddLayer(new CVis_TestLayer1());
+	LayerManagerInstance->AddLayer(new CVis_TestLayer1());
 
-	/*int iCount = 10;
+	int iCount = 10;
 	for(int i=1;i<=iCount;i++)
 	{
 		int iFreqStep = i * i * 4;
 		if(iFreqStep > FFT_DATAARRAY_SIZE)
 			break;
-		m_pLayerManager->AddLayer(new CVis_CubeWalking(iFreqStep));
-	}*/
+		LayerManagerInstance->AddLayer(new VisualizationCubeWalking(iFreqStep));
+	}
 
-	m_pLayerManager->AddLayer(new CVis_Spectrum());
+	LayerManagerInstance->AddLayer(new VisualizationSpectrum());
 }
 
 void CPunchApplication::PopulatePlaylist()
@@ -97,7 +99,7 @@ void CPunchApplication::PopulatePlaylist()
 	for(int i=1;i<g_argc;i++)
 	{
 		printf("Adding to playlist: %s\n",g_argv[i]);
-		m_pMusicModule->PlaylistAddItem(g_argv[i]);
+		MusicModuleInstance->PlaylistAddItem(g_argv[i]);
 	}
 }
 
@@ -134,31 +136,31 @@ void CPunchApplication::InitializeGLFW()
 
 	if( bFullScreen && !bNoBorder )
 	{
-		m_pAppWindow = glfwCreateWindow( sVideoMode->width, sVideoMode->height, APP_WINDOW_TITLE, glfwGetPrimaryMonitor(), NULL );
+		ApplicationWindow = glfwCreateWindow( sVideoMode->width, sVideoMode->height, APP_WINDOW_TITLE, glfwGetPrimaryMonitor(), NULL );
 	}
 	else
 	{
 		if( nWidth < 0 || nHeight < 0 )
 		{
-			m_pAppWindow = glfwCreateWindow( sVideoMode->width, sVideoMode->height, APP_WINDOW_TITLE, NULL, NULL );
+			ApplicationWindow = glfwCreateWindow( sVideoMode->width, sVideoMode->height, APP_WINDOW_TITLE, NULL, NULL );
 		}
 		else
 		{
-			m_pAppWindow = glfwCreateWindow( nWidth, nHeight, APP_WINDOW_TITLE, NULL, NULL );
+			ApplicationWindow = glfwCreateWindow( nWidth, nHeight, APP_WINDOW_TITLE, NULL, NULL );
 		}
 	}
 
-	if (!m_pAppWindow)
+	if (!ApplicationWindow)
 	{
 		glfwTerminate();
 		Exit(APP_ERROR_GLFW_WINDOW);
 	}
 
 	//Make window's context current
-	glfwMakeContextCurrent(m_pAppWindow);
+	glfwMakeContextCurrent(ApplicationWindow);
 
-	glfwSetKeyCallback( m_pAppWindow, CPunchApplication::HandleKeyEvents );
-	glfwSetDropCallback( m_pAppWindow, CPunchApplication::HandlePathDrop );
+	glfwSetKeyCallback( ApplicationWindow, CPunchApplication::HandleKeyEvents );
+	glfwSetDropCallback( ApplicationWindow, CPunchApplication::HandlePathDrop );
 
 	glfwSwapInterval(0);
 }
@@ -175,7 +177,7 @@ void CPunchApplication::MainLoop()
 	glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(glm::vec3), &points[0], GL_STATIC_DRAW);
 
 	//Loop as long as the window is open
-	while (!glfwWindowShouldClose(m_pAppWindow))
+	while (!glfwWindowShouldClose(ApplicationWindow))
 	{
 		//Logic tick
 		if( GetDeltaTime() > 0.016667 )
@@ -201,11 +203,11 @@ void CPunchApplication::MainLoop()
 
 void CPunchApplication::HandleLogic()
 {
-	if(m_pMusicModule)
+	if(MusicModuleInstance)
 	{
-		m_pMusicModule->Think();
-		if(m_pLayerManager)
-			m_pLayerManager->UpdateLayers(m_pMusicModule->GetFFTData());
+		MusicModuleInstance->Think();
+		if(LayerManagerInstance)
+			LayerManagerInstance->UpdateLayers(MusicModuleInstance->GetFFTData());
 	}
 }
 
@@ -214,12 +216,12 @@ void CPunchApplication::HandleDraw()
 	// Draw scene
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_pLayerManager->DrawLayers();
+	LayerManagerInstance->DrawLayers();
 
 	glPointSize(4.0f);
 
 	//Swap front and back buffers
-	glfwSwapBuffers(m_pAppWindow);
+	glfwSwapBuffers(ApplicationWindow);
 }
 
 void CPunchApplication::HandleKeyEvents(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -228,14 +230,20 @@ void CPunchApplication::HandleKeyEvents(GLFWwindow* window, int key, int scancod
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
 	{
-		if(m_pMusicModule)
-			m_pMusicModule->MusicPlayNextItem();
-		m_pLayerManager->ResetLayers();
+		if(MusicModuleInstance)
+			MusicModuleInstance->MusicPlayNextItem();
+		LayerManagerInstance->ResetLayers();
 	}
 	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
 	{
-		if(m_pMusicModule)
-			m_pMusicModule->MusicPlayPreviousItem();
+		if(MusicModuleInstance)
+			MusicModuleInstance->MusicPlayPreviousItem();
+	}
+	if( key == GLFW_KEY_ENTER && action == GLFW_PRESS )
+	{
+		printf( "Restarting music module...\n" );
+		delete MusicModuleInstance;
+		InitializeMusicModule();
 	}
 }
 
@@ -247,31 +255,31 @@ void CPunchApplication::HandlePathDrop( GLFWwindow* window, int count, const cha
 	for( int i = 0; i < count; i++ )
 	{
 		printf( "Adding dropped file to playlist: %s\n", paths[i] );
-		m_pMusicModule->PlaylistAddItem( paths[i] );
+		MusicModuleInstance->PlaylistAddItem( paths[i] );
 	}
 
-	unsigned int itemIndex = m_pMusicModule->PlaylistSize() - count;
-	m_pMusicModule->MusicPlayItemAtIndex( itemIndex );
+	unsigned int itemIndex = MusicModuleInstance->PlaylistSize() - count;
+	MusicModuleInstance->MusicPlayItemAtIndex( itemIndex );
 }
 
 double CPunchApplication::GetDeltaTime()
 {
-	return glfwGetTime() - m_dTimeLastTick;
+	return glfwGetTime() - LastTickTime;
 }
 
 void CPunchApplication::UpdateDeltaTime()
 {
-	m_dTimeLastTick = glfwGetTime();
+	LastTickTime = glfwGetTime();
 }
 
 double CPunchApplication::GetDrawDeltaTime()
 {
-	return glfwGetTime() - m_dTimeLastFrame;
+	return glfwGetTime() - LastFrameTime;
 }
 
 void CPunchApplication::UpdateDrawDeltaTime()
 {
-	m_dTimeLastFrame = glfwGetTime();
+	LastFrameTime = glfwGetTime();
 }
 
 void CPunchApplication::Run()
@@ -286,32 +294,32 @@ void CPunchApplication::Exit()
 	exit(0);
 }
 
-void CPunchApplication::Exit(int iErrorCode)
+void CPunchApplication::Exit(int ErrorCode)
 {
-	printf("Exiting with error code %i\n", iErrorCode);
+	printf("Exiting with error code %i\n", ErrorCode);
 #ifdef _WIN32
 	char cErrorMsg[128];
-	sprintf_s(cErrorMsg,128,"Code: %i",iErrorCode);
+	sprintf_s(cErrorMsg,128,"Code: %i",ErrorCode);
 	if(cErrorMsg)
 	{
-		MessageBoxA(glfwGetWin32Window(m_pAppWindow), cErrorMsg, "Error", MB_OK|MB_ICONERROR|MB_APPLMODAL);
+		MessageBoxA(glfwGetWin32Window(ApplicationWindow), cErrorMsg, "Error", MB_OK|MB_ICONERROR|MB_APPLMODAL);
 	}
 #endif
-	exit(iErrorCode);
+	exit(ErrorCode);
 }
 
-void CPunchApplication::Exit(int iErrorCode, const char* cErrorMessage)
+void CPunchApplication::Exit(int ErrorCode, const char* ErrorMessage)
 {
-	printf("Exiting with error code %i\n", iErrorCode);
+	printf("Exiting with error code %i\n", ErrorCode);
 #ifdef _WIN32
 	char cErrorMsg[128];
-	sprintf_s(cErrorMsg,128,"Code: %i\nMessage: %s",iErrorCode,cErrorMessage);
+	sprintf_s(cErrorMsg,128,"Code: %i\nMessage: %s",ErrorCode,ErrorMessage);
 	if(cErrorMsg)
 	{
-		MessageBoxA(glfwGetWin32Window(m_pAppWindow), cErrorMsg, "Error", MB_OK|MB_ICONERROR|MB_APPLMODAL);
+		MessageBoxA(glfwGetWin32Window(ApplicationWindow), cErrorMsg, "Error", MB_OK|MB_ICONERROR|MB_APPLMODAL);
 	}
 #endif
-	exit(iErrorCode);
+	exit(ErrorCode);
 }
 
 //Entry point

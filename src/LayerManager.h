@@ -7,13 +7,13 @@ public:
 	CLayerManager();
 	~CLayerManager();
 
-	void AddLayer(CVisLayer *layer);
+	void AddLayer(VisualizationLayer *layer);
 	//void RemoveLayer(VisLayer layer);
 
-	void UpdateLayers(FFT_DataArray fft_data);
+	void UpdateLayers(FFTDataArray fft_data);
 	void DrawLayers();
 	void ResetLayers();
 
 protected:
-	std::vector<CVisLayer*> pVisLayers;
+	std::vector<VisualizationLayer*> VisualizationLayers;
 };

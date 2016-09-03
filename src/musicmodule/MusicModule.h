@@ -8,7 +8,7 @@
 #define FFT_DATAARRAY_SIZE 512
 
 //Holds FFT data
-struct FFT_DataArray
+struct FFTDataArray
 {
 	float fft_data[FFT_DATAARRAY_SIZE];
 };
@@ -52,16 +52,19 @@ public:
 	virtual unsigned int PlaylistSize();
 
 	//Returns FFT data array
-	virtual FFT_DataArray GetFFTData() = 0;
+	virtual FFTDataArray GetFFTData() = 0;
 
 	//Verification functions
 	virtual bool IsPlaying() = 0;
 	virtual bool IsPaused() = 0;
 	virtual bool HasEnded() = 0;
 protected:
-	std::vector<std::string>	szPlaylist;
+	std::vector<std::string>	m_szPlaylist;
 
 	int m_eSupportFlags;
+	
+	bool m_bAutoGain;
+	float m_bAutoGainMultiplier;
 private:
 	//
 };

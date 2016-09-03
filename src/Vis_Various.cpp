@@ -1,6 +1,6 @@
 #include "Vis_Various.h"
 
-CVis_CubeWalking::CVis_CubeWalking(int iFrequency)
+VisualizationCubeWalking::VisualizationCubeWalking(int iFrequency)
 {
 	iProgressionX = 0;
 	iProgressionY = 0;
@@ -16,12 +16,12 @@ CVis_CubeWalking::CVis_CubeWalking(int iFrequency)
 	glGenBuffers(1, &VBO);
 }
 
-CVis_CubeWalking::~CVis_CubeWalking()
+VisualizationCubeWalking::~VisualizationCubeWalking()
 {
 
 }
 
-void CVis_CubeWalking::Think(FFT_DataArray fft_data)
+void VisualizationCubeWalking::Think(FFTDataArray fft_data)
 {
 	points.clear();
 	float flDataNew = fft_data.fft_data[m_iFrequency];
@@ -55,10 +55,10 @@ void CVis_CubeWalking::Think(FFT_DataArray fft_data)
 	points.push_back(glm::vec3(flFaceOffsetX + flFaceSizeX, flFaceOffsetY + flFaceSizeY,0.0f));
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(glm::vec3), &points[0], GL_STATIC_DRAW);
+	glBufferData( GL_ARRAY_BUFFER, points.size() * sizeof( glm::vec3 ), &points[0], GL_DYNAMIC_DRAW );
 }
 
-void CVis_CubeWalking::Draw()
+void VisualizationCubeWalking::Draw()
 {
 	glPointSize(2.0f);
 
@@ -74,7 +74,7 @@ void CVis_CubeWalking::Draw()
 	glDisableVertexAttribArray(0);
 }
 
-void CVis_CubeWalking::Reset()
+void VisualizationCubeWalking::Reset()
 {
 	iProgressionX = 0;
 	iProgressionY = 0;

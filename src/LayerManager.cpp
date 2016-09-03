@@ -10,31 +10,31 @@ CLayerManager::~CLayerManager()
 
 }
 
-void CLayerManager::AddLayer(CVisLayer *layer)
+void CLayerManager::AddLayer(VisualizationLayer *layer)
 {
-	pVisLayers.push_back(layer);
+	VisualizationLayers.push_back(layer);
 }
 
-void CLayerManager::UpdateLayers(FFT_DataArray fft_data)
+void CLayerManager::UpdateLayers(FFTDataArray fft_data)
 {
-	for(unsigned int idx = 0; idx < pVisLayers.size(); idx++)
+	for(unsigned int idx = 0; idx < VisualizationLayers.size(); idx++)
 	{
-		pVisLayers[idx]->Think(fft_data);
+		VisualizationLayers[idx]->Think(fft_data);
 	}
 }
 
 void CLayerManager::DrawLayers()
 {
-	for(unsigned int idx = 0; idx < pVisLayers.size(); idx++)
+	for(unsigned int idx = 0; idx < VisualizationLayers.size(); idx++)
 	{
-		pVisLayers[idx]->Draw();
+		VisualizationLayers[idx]->Draw();
 	}
 }
 
 void CLayerManager::ResetLayers()
 {
-	for(unsigned int idx = 0; idx < pVisLayers.size(); idx++)
+	for(unsigned int idx = 0; idx < VisualizationLayers.size(); idx++)
 	{
-		pVisLayers[idx]->Reset();
+		VisualizationLayers[idx]->Reset();
 	}
 }

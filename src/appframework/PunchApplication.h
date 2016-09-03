@@ -51,19 +51,19 @@ public:
 	~CPunchApplication();
 
 	void Run();
-	void Exit();
-	void Exit(int iErrorCode);
-	void Exit(int iErrorCode, const char* cErrorMessage);
+	static void Exit();
+	static void Exit( int ErrorCode );
+	static void Exit( int ErrorCode, const char* ErrorMessage );
 protected:
 	//
 private:
 	void Initialize();
 	void InitializeGLEW();
 	void InitializeGLFW();
-	void InitializeMusicModule();
+	static void InitializeMusicModule();
 	void InitializeLayerManager();
 
-	void PopulatePlaylist();
+	static void PopulatePlaylist();
 
 	void MainLoop();
 
@@ -79,11 +79,11 @@ private:
 	double	GetDrawDeltaTime();
 	void	UpdateDrawDeltaTime();
 
-	double m_dTimeLastTick;
-	double m_dTimeLastFrame;
-	GLFWwindow* m_pAppWindow;
+	double LastTickTime;
+	double LastFrameTime;
+	static GLFWwindow* ApplicationWindow;
 
-	static CMusicModule* m_pMusicModule;
-	static CLayerManager* m_pLayerManager;
-	static CConfigurationManager* m_pConfigurationManager;
+	static CMusicModule* MusicModuleInstance;
+	static CLayerManager* LayerManagerInstance;
+	static CConfigurationManager* ConfigurationManagerInstance;
 };

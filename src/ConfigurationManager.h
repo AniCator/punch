@@ -14,6 +14,7 @@ public:
 	bool IsEnabled( const char* keyName );
 	const char* GetString( const char* keyName );
 	int GetInteger( const char* keyName );
+	double GetDouble( const char* keyName );
 
 	void Initialize( std::string filePath );
 

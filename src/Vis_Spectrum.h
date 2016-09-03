@@ -1,15 +1,17 @@
 #pragma once
 #include "VisLayer.h"
 
-class CVis_Spectrum : public CVisLayer
+class VisualizationSpectrum : public VisualizationLayer
 {
 public:
-	CVis_Spectrum();
-	~CVis_Spectrum();
+	VisualizationSpectrum();
+	~VisualizationSpectrum();
 
-	virtual void Think(FFT_DataArray fft_data);
+	virtual void Think(FFTDataArray fft_data);
 	virtual void Draw();
 
 	GLuint VBO;					//temp
 	std::vector<glm::vec3> points;	//temp
+	FFTDataArray m_DataOld;
+	float m_flInterpolationSpeed;
 };

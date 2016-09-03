@@ -1,11 +1,11 @@
 #include "VisLayer.h"
 
-CVisLayer::CVisLayer()
+VisualizationLayer::VisualizationLayer()
 {
 
 }
 
-CVisLayer::~CVisLayer()
+VisualizationLayer::~VisualizationLayer()
 {
 
 }

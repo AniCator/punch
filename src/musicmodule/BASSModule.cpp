@@ -1,18 +1,41 @@
 #include "BASSModule.h"
 
+float CBASSModule::m_flReferenceVolume = -1.0f;
+
 //Initialize the music module
 int CBASSModule::Initialize()
 {
+	BASS_Free();
 	if(!BASS_Init(-1, 44100, 0, 0, NULL))
 	{
 		return APP_ERROR_BASS_INIT;
 	}
 
 	m_eSupportFlags = USE_INPUT;
+	m_bAutoGain = CConfigurationManager::GetInstance().IsEnabled( "auto_gain" );
+	m_bAutoGainMultiplier = ( float ) max( 0.0, min( 1.0, CConfigurationManager::GetInstance().GetDouble( "auto_gain_volume" ) ) );
+	m_flGain = 0.0f;
+
+	m_flAGCReference = pow( 10.0f, ( -18.0f / 10.0f ) ); //-18dBFS Convert to Linear
+	m_flAGCRate = ( float ) max(0.0, CConfigurationManager::GetInstance().GetDouble( "auto_gain_rate" )); // coefficient when increasing/decreasing gain
+
+	for( int i = 0; i < FFT_DATAARRAY_SIZE; i++ )
+	{
+		m_flFFTDataArray.fft_data[i] = 0.0f;
+	}
 
 	LoadPlugins();
 
 	return APP_ERROR_NONE;
+}
+
+float CBASSModule::PerformAutomaticGainControl( float InputGain )
+{
+	InputGain = InputGain * m_flGain; //scale input(x)
+
+	m_flGain += ( m_flAGCReference - ( fabs( InputGain ) * fabs( InputGain ) ) ) * m_flAGCRate;
+
+	return InputGain * m_bAutoGainMultiplier;
 }
 
 void CBASSModule::Think()
@@ -21,13 +44,26 @@ void CBASSModule::Think()
 		MusicPlayNextItem();
 	else
 	{
-		BASS_ChannelGetData(iStream,flFFT_DataArray.fft_data,BASS_DATA_FFT1024|BASS_DATA_FLOAT);
-
-		for(int i=0;i<FFT_DATAARRAY_SIZE;i++)
+		if( IsPlaying() )
 		{
-			flFFT_DataArray.fft_data[i] *= (((float)i + 0.1f) / (float)FFT_DATAARRAY_SIZE);
-			flFFT_DataArray.fft_data[i] *= (float)FFT_DATAARRAY_SIZE - (float)i;
-			flFFT_DataArray.fft_data[i] /= 50.0f;
+			BASS_ChannelGetData( iStream, m_flFFTDataArray.fft_data, BASS_DATA_FFT1024 | BASS_DATA_FLOAT );
+
+			for( int i = 0; i < FFT_DATAARRAY_SIZE; i++ )
+			{
+				m_flFFTDataArray.fft_data[i] *= ( ( (float) i + 0.1f ) / (float) FFT_DATAARRAY_SIZE );
+				m_flFFTDataArray.fft_data[i] *= (float) FFT_DATAARRAY_SIZE - (float) i;
+				m_flFFTDataArray.fft_data[i] /= 50.0f;
+
+				if( m_flReferenceVolume > 0.0f )
+				{
+					m_flFFTDataArray.fft_data[i] *= m_flReferenceVolume;
+				}
+
+				if( m_bAutoGain )
+				{
+					m_flFFTDataArray.fft_data[i] = PerformAutomaticGainControl( m_flFFTDataArray.fft_data[i] );
+				}
+			}
 		}
 	}
 }
@@ -38,7 +74,7 @@ void CBASSModule::LoadPlugins()
 	//Load FLAC library
 #ifdef _WIN32
 	BASS_PluginLoad( "bassflac.dll", 0 );
-	if( BASS_ErrorGetCode() != 0 )
+	if( BASS_ErrorGetCode() != 0 && BASS_ErrorGetCode() != BASS_ERROR_ALREADY )
 	{
 		printf( "Could not load FLAC plugin. Error: %i\n", BASS_ErrorGetCode() );
 	}
@@ -50,7 +86,7 @@ void CBASSModule::MusicLoad()
 {
 	if(iStream)
 		BASS_StreamFree(iStream);
-	BASS_INT iNewStream = BASS_StreamCreateFile(false,szPlaylist[iCurrentItemIdx].c_str(),0,0,0);
+	BASS_INT iNewStream = BASS_StreamCreateFile(false,m_szPlaylist[m_iCurrentItemIdx].c_str(),0,0,0);
 	if(iNewStream)
 		iStream = iNewStream;
 }
@@ -106,26 +142,38 @@ void CBASSModule::RecordStart()
 	printf( "\nListening to device: %s\n", info.name );
 
 	iStream = BASS_RecordStart( 44100, 2, MAKELONG( 0, 5 ), &CBASSModule::RecordCallback, this );
+
+	int nReferenceVolume = CConfigurationManager::GetInstance().GetInteger( "input_reference_volume" );
+	if( nReferenceVolume > 0 )
+	{
+		nReferenceVolume = max( 1, min( 100, nReferenceVolume ) );
+		float flVolume = ( float ) nReferenceVolume / 100.0f;
+		flVolume = 1.0f + ( 1.0f - flVolume );
+		m_flReferenceVolume = flVolume * 2.0f;
+		printf( "Compensating reference volume: %.2f\n", m_flReferenceVolume );
+	}
 }
 
 void CBASSModule::RecordStop()
 {
 	BASS_RecordFree();
+	if( iStream )
+		BASS_StreamFree( iStream );
 }
 
 //Playback functions - playlist related
 void CBASSModule::MusicPlayPreviousItem()
 {
-	if(szPlaylist.size() == 0)
+	if(m_szPlaylist.size() == 0)
 		return;
 
-	if(iCurrentItemIdx != 0)
+	if(m_iCurrentItemIdx != 0)
 	{
-		iCurrentItemIdx -= 1;
+		m_iCurrentItemIdx -= 1;
 	}
 	else
 	{
-		iCurrentItemIdx = szPlaylist.size() - 1;
+		m_iCurrentItemIdx = m_szPlaylist.size() - 1;
 	}
 
 	MusicStop();
@@ -135,39 +183,39 @@ void CBASSModule::MusicPlayPreviousItem()
 
 void CBASSModule::MusicPlayNextItem()
 {
-	if(szPlaylist.empty())
+	if(m_szPlaylist.empty())
 		return;
 
-	if(iCurrentItemIdx < szPlaylist.size() - 1)
+	if(m_iCurrentItemIdx < m_szPlaylist.size() - 1)
 	{
-		iCurrentItemIdx += 1;
+		m_iCurrentItemIdx += 1;
 	}
 	else
 	{
-		iCurrentItemIdx = 0;
+		m_iCurrentItemIdx = 0;
 	}
 
 	MusicStop();
 	MusicLoad();
 	MusicPlay();
 
-	printf( "Playing: %s\n", szPlaylist[iCurrentItemIdx] );
+	printf( "Playing: %s\n", m_szPlaylist[m_iCurrentItemIdx].c_str() );
 }
 
 void CBASSModule::MusicPlayItemAtIndex( unsigned int itemIndex )
 {
-	iCurrentItemIdx = max( 0, min( itemIndex, szPlaylist.size() ) );
+	m_iCurrentItemIdx = max( 0, min( itemIndex, m_szPlaylist.size() ) );
 
 	MusicStop();
 	MusicLoad();
 	MusicPlay();
 
-	printf( "Playing: %s\n", szPlaylist[iCurrentItemIdx] );
+	printf( "Playing: %s\n", m_szPlaylist[m_iCurrentItemIdx].c_str() );
 }
 
-FFT_DataArray CBASSModule::GetFFTData()
+FFTDataArray CBASSModule::GetFFTData()
 {
-	return flFFT_DataArray;
+	return m_flFFTDataArray;
 }
 
 //Verification functions

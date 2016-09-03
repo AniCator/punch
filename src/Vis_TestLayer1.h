@@ -1,14 +1,14 @@
 #pragma once
 #include "VisLayer.h"
 
-class CVis_TestLayer1 : public CVisLayer
+class CVis_TestLayer1 : public VisualizationLayer
 {
 public:
 	CVis_TestLayer1();
 	CVis_TestLayer1(float flBaseRingSize, float flBaseRingOffset, float flBasePeriodMultiplier, int iFrequency, SimpleColor color);
 	~CVis_TestLayer1();
 
-	virtual void Think(FFT_DataArray fft_data);
+	virtual void Think(FFTDataArray fft_data);
 	virtual void Draw();
 
 	virtual void Reset();

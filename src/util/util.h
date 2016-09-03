@@ -2,6 +2,9 @@
 #include "glm.hpp"
 
 #include <string>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 inline glm::vec3 Lerp(glm::vec3 start, glm::vec3 end, float amount)
 {

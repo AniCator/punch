@@ -1,24 +1,37 @@
 #include "Vis_Spectrum.h"
 
-CVis_Spectrum::CVis_Spectrum()
+#include "util/util.h"
+#include "ConfigurationManager.h"
+
+VisualizationSpectrum::VisualizationSpectrum()
 {
 	glGenBuffers(1, &VBO);
+	m_flInterpolationSpeed = max( 0.0f, min( 1.0f, ( float ) CConfigurationManager::GetInstance().GetDouble( "spectrum_interpolation_speed" ) ) );
+
+	int iSize = FFT_DATAARRAY_SIZE;
+	for( int i = 0; i < iSize; i++ )
+	{
+		m_DataOld.fft_data[i] = 0.0f;
+	}
 }
 
-CVis_Spectrum::~CVis_Spectrum()
+VisualizationSpectrum::~VisualizationSpectrum()
 {
 
 }
-void CVis_Spectrum::Think(FFT_DataArray fft_data)
+void VisualizationSpectrum::Think(FFTDataArray fft_data)
 {
 	points.clear();
 	int iSize = FFT_DATAARRAY_SIZE;
 	for(int i = 0; i < iSize; i++)
 	{
 		float flDataNew = fft_data.fft_data[i];
+		float flDataOld = m_DataOld.fft_data[i];
+		flDataNew = Lerp( flDataOld, flDataNew, m_flInterpolationSpeed );
+		m_DataOld.fft_data[i] = flDataNew;
 
-		float flHeight = (float)flDataNew * 3.0f;
-		float flModifier = 1.0f;
+		float flHeight = (float)flDataNew * 5.0f;
+		float flModifier = 2.0f;
 		float flHalfWidth = (2.0f / (float)iSize) * flModifier * 0.4f;
 		float flX = ((2.0f / (float)iSize) * i * flModifier) - 1.0f;
 		float flY = flHeight * (2.0f * flModifier) - 1.0f;
@@ -33,10 +46,10 @@ void CVis_Spectrum::Think(FFT_DataArray fft_data)
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(glm::vec3), &points[0], GL_STATIC_DRAW);
+	glBufferData( GL_ARRAY_BUFFER, points.size() * sizeof( glm::vec3 ), &points[0], GL_DYNAMIC_DRAW );
 }
 
-void CVis_Spectrum::Draw()
+void VisualizationSpectrum::Draw()
 {
 	glPointSize(2.0f);
 

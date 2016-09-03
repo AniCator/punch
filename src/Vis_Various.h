@@ -1,13 +1,13 @@
 #pragma once
 #include "VisLayer.h"
 
-class CVis_CubeWalking : public CVisLayer
+class VisualizationCubeWalking : public VisualizationLayer
 {
 public:
-	CVis_CubeWalking( int iFrequency );
-	~CVis_CubeWalking();
+	VisualizationCubeWalking( int iFrequency );
+	~VisualizationCubeWalking();
 
-	virtual void Think(FFT_DataArray fft_data);
+	virtual void Think(FFTDataArray fft_data);
 	virtual void Draw();
 	virtual void Reset();
 

@@ -49,7 +49,7 @@ CVis_TestLayer1::~CVis_TestLayer1()
 
 }
 
-void CVis_TestLayer1::Think(FFT_DataArray fft_data)
+void CVis_TestLayer1::Think(FFTDataArray fft_data)
 {
 	m_flCirclePeriod += fft_data.fft_data[m_iFrequency] * (50.0f * m_flBasePeriodMultiplier);
 	m_flRingSize = m_flBaseRingOffset + fft_data.fft_data[m_iFrequency] * (50.0f * m_flBaseRingSize);
@@ -80,17 +80,17 @@ void CVis_TestLayer1::Think(FFT_DataArray fft_data)
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(glm::vec3), &points[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(glm::vec3), &points[0], GL_DYNAMIC_DRAW);
 }
 
 void CVis_TestLayer1::Draw()
 {
-	glPointSize(2.0f);
-
 	float flNewValue = m_flLastRecordedFrequencyValue * 70.0f;
 	float flColorMultiplier = 0.0f;
 	flColorMultiplier = (flNewValue*0.1f) + (m_flOldColorMultiplier*0.9f);
 	m_flOldColorMultiplier = flColorMultiplier;
+
+	glPointSize( 1.0f + (2.5f * flColorMultiplier) );
 
 	glColor3f(m_sColor.r * flColorMultiplier,m_sColor.g * flColorMultiplier,m_sColor.b * flColorMultiplier);
 

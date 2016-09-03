@@ -17,13 +17,13 @@ struct SimpleColor
 	float b;
 };
 
-class CVisLayer
+class VisualizationLayer
 {
 public:
-	CVisLayer();
-	~CVisLayer();
+	VisualizationLayer();
+	~VisualizationLayer();
 
-	virtual void Think(FFT_DataArray fft_data) = 0;
+	virtual void Think(FFTDataArray fft_data) = 0;
 	virtual void Draw() = 0;
 
 	virtual void Reset() {};

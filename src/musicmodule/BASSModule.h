@@ -28,12 +28,14 @@ public:
 	virtual void MusicPlayItemAtIndex( unsigned int itemIndex );
 
 	//Returns FFT data array
-	virtual FFT_DataArray GetFFTData();
+	virtual FFTDataArray GetFFTData();
 
 	//Verification functions
 	virtual bool IsPlaying();
 	virtual bool IsPaused();
 	virtual bool HasEnded();
+
+	float PerformAutomaticGainControl( float x );
 
 	BASS_INT iStream;
 private:
@@ -41,7 +43,11 @@ private:
 
 	void MusicLoad();
 
-	unsigned int				iCurrentItemIdx;
+	unsigned int				m_iCurrentItemIdx;
+	static float m_flReferenceVolume;
+	float m_flGain;
+	float m_flAGCReference;
+	float m_flAGCRate;
 
-	FFT_DataArray flFFT_DataArray;
+	FFTDataArray m_flFFTDataArray;
 };
