@@ -7,10 +7,16 @@
 
 #include "glm.hpp"
 
-struct SimpleColor
+struct FColor
 {
-	SimpleColor() {};
-	SimpleColor(float r1, float g1, float b1) { r=r1;g=g1;b=b1; }
+	FColor() {};
+
+	FColor(float rIn, float gIn, float bIn)
+	{
+		r = rIn;
+		g = gIn;
+		b = bIn;
+	}
 
 	float r;
 	float g;
@@ -23,7 +29,7 @@ public:
 	VisualizationLayer();
 	~VisualizationLayer();
 
-	virtual void Think(FFTDataArray fft_data) = 0;
+	virtual void Think(DataArrayFFT fft_data) = 0;
 	virtual void Draw() = 0;
 
 	virtual void Reset() {};

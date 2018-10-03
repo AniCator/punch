@@ -1,14 +1,14 @@
 #pragma once
 #include "VisLayer.h"
 
-class CVis_TestLayer1 : public VisualizationLayer
+class VisualizationQuantumRing : public VisualizationLayer
 {
 public:
-	CVis_TestLayer1();
-	CVis_TestLayer1(float flBaseRingSize, float flBaseRingOffset, float flBasePeriodMultiplier, int iFrequency, SimpleColor color);
-	~CVis_TestLayer1();
+	VisualizationQuantumRing();
+	VisualizationQuantumRing(float flBaseRingSize, float flBaseRingOffset, float flBasePeriodMultiplier, int iFrequency, FColor color);
+	~VisualizationQuantumRing();
 
-	virtual void Think(FFTDataArray fft_data);
+	virtual void Think(DataArrayFFT fft_data);
 	virtual void Draw();
 
 	virtual void Reset();
@@ -16,19 +16,32 @@ public:
 	GLuint VBO;					//temp
 	std::vector<glm::vec3> points;	//temp
 
-	float m_flBaseRingSize;
-	float m_flBaseRingOffset;
-	float m_flBasePeriodMultiplier;
+	float BaseRingSize;
+	float BaseRingOffset;
+	float BasePeriodMultiplier;
 
-	SimpleColor m_sColor;
+	FColor QuantumRingColor;
 
-	float m_flRingSize;
-	float m_flOldRingSize;
-	float m_flCirclePeriod;
+	float RingSize;
+	float OldRingSize;
+	float CirclePeriod;
 	
-	int m_iFrequency;
-	float m_flLastRecordedFrequencyValue;
-	float m_flAverageFrequencyValue;
+	int Frequency;
+	float LastRecordedFrequencyValue;
+	float AverageFrequencyValue;
 
-	float m_flOldColorMultiplier;
+	float ColorMultiplier;
+	float OldColorMultiplier;
+
+	unsigned int PeriodPoints;
+	unsigned int PeriodLines;
+	unsigned int PeriodStep;
+	unsigned int PeriodBassFrequency;
+	float PeriodBassMultiplier;
+	float PeriodPointSize;
+
+	DataArrayFFT DataPrevious;
+	float InterpolationSpeed;
+
+	float MedianMultiplier;
 };

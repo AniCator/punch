@@ -7,7 +7,7 @@ public:
 	VisualizationCubeWalking( int iFrequency );
 	~VisualizationCubeWalking();
 
-	virtual void Think(FFTDataArray fft_data);
+	virtual void Think(DataArrayFFT fft_data);
 	virtual void Draw();
 	virtual void Reset();
 

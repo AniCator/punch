@@ -4,18 +4,19 @@
 
 #include <vector>
 #include <string>
+#include <stdint.h>
 
-#define FFT_DATAARRAY_SIZE 512
+static const uint32_t DataArraySizeFFT = 512;
 
 //Holds FFT data
-struct FFTDataArray
+struct DataArrayFFT
 {
-	float fft_data[FFT_DATAARRAY_SIZE];
+	float Data[DataArraySizeFFT];
 };
 
 enum ESupportFlag
 {
-	USE_INPUT,
+	UseInput,
 };
 
 class CMusicModule
@@ -24,47 +25,51 @@ public:
 	CMusicModule();
 	~CMusicModule();
 
-	//Initialize the music module
+	// Initialize the music module
 	virtual int Initialize() = 0;
 
 	virtual void Think() = 0;
 
-	//Support flag functions
+	// Support flag functions
 	virtual int GetSupportFlags();
 
-	//Playback functions
-	virtual void MusicPlay() = 0;
+	// Playback functions
+	virtual void MusicPlay( bool bRestart ) = 0;
 	virtual void MusicPause() = 0;
 	virtual void MusicStop() = 0;
+	virtual void MusicSpeed( float Percentage ) = 0;
 
-	//Recording functions
+	// Recording functions
 	virtual void RecordStart() {};
 	virtual void RecordStop() {};
 
-	//Playback functions - playlist related
+	// Playback functions - playlist related
 	virtual void MusicPlayPreviousItem() = 0;
 	virtual void MusicPlayNextItem() = 0;
 	virtual void MusicPlayItemAtIndex(unsigned int itemIndex) = 0;
+	virtual void MusicForwardTime( double Increment ) = 0;
+	virtual double MusicGetPosition() = 0;
+	virtual double MusicGetLength() = 0;
 
-	//Playlist functions
-	virtual void PlaylistAddItem(std::string szItemLocation);
+	// Playlist functions
+	virtual void PlaylistAddItem(std::wstring szItemLocation);
 	virtual void PlaylistClear();
 	virtual unsigned int PlaylistSize();
 
-	//Returns FFT data array
-	virtual FFTDataArray GetFFTData() = 0;
+	// Returns FFT data array
+	virtual DataArrayFFT GetFFTData() = 0;
 
-	//Verification functions
+	// Verification functions
 	virtual bool IsPlaying() = 0;
 	virtual bool IsPaused() = 0;
 	virtual bool HasEnded() = 0;
 protected:
-	std::vector<std::string>	m_szPlaylist;
+	std::vector<std::wstring>	Playlist;
 
-	int m_eSupportFlags;
+	int SupportFlags;
 	
-	bool m_bAutoGain;
-	float m_bAutoGainMultiplier;
+	bool UseAutoGain;
+	float AutoGainMultiplier;
 private:
 	//
 };

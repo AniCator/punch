@@ -10,7 +10,9 @@ public:
 	void AddLayer(VisualizationLayer *layer);
 	//void RemoveLayer(VisLayer layer);
 
-	void UpdateLayers(FFTDataArray fft_data);
+	void Clear();
+
+	void UpdateLayers(DataArrayFFT fft_data);
 	void DrawLayers();
 	void ResetLayers();
 

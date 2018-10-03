@@ -51,39 +51,58 @@ public:
 	~CPunchApplication();
 
 	void Run();
-	static void Exit();
-	static void Exit( int ErrorCode );
-	static void Exit( int ErrorCode, const char* ErrorMessage );
+	void Exit();
+	void Exit( int ErrorCode );
+	void Exit( int ErrorCode, const char* ErrorMessage );
+
+	double	GetDeltaTime();
+	double	GetDrawDeltaTime();
+
+	void HandleKeyEvents( GLFWwindow* window, int key, int scancode, int action, int mods );
+	void HandlePathDrop( GLFWwindow* window, int count, const char** paths );
 protected:
 	//
 private:
 	void Initialize();
 	void InitializeGLEW();
 	void InitializeGLFW();
-	static void InitializeMusicModule();
-	void InitializeLayerManager();
 
-	static void PopulatePlaylist();
+	void InitializeMusicModule();
+	void InitializeLayerManager();
+	void CreateApplicationWindow();
+
+	void PopulatePlaylist();
 
 	void MainLoop();
 
 	void HandleLogic();
 	void HandleDraw();
 
-	static void HandleKeyEvents(GLFWwindow* window, int key, int scancode, int action, int mods);
-	static void HandlePathDrop( GLFWwindow* window, int count, const char** paths );
+	void InitializeProgressBar();
+	void UpdateProgressBar();
+	void DrawProgressBar();
 
-	double	GetDeltaTime();
 	void	UpdateDeltaTime();
-
-	double	GetDrawDeltaTime();
 	void	UpdateDrawDeltaTime();
 
+	double TickTime;
+	double FrameTime;
 	double LastTickTime;
 	double LastFrameTime;
-	static GLFWwindow* ApplicationWindow;
+	GLFWwindow* ApplicationWindow;
 
-	static CMusicModule* MusicModuleInstance;
-	static CLayerManager* LayerManagerInstance;
-	static CConfigurationManager* ConfigurationManagerInstance;
+	CMusicModule* MusicModuleInstance;
+	CLayerManager* LayerManagerInstance;
+	CConfigurationManager* ConfigurationManagerInstance;
+
+public:
+	static CPunchApplication& GetInstance()
+	{
+		static CPunchApplication    instance; // Guaranteed to be destroyed.
+												  // Instantiated on first use.
+		return instance;
+	}
+private:
+	CPunchApplication( CPunchApplication const& ) = delete;
+	void operator=( CPunchApplication const& ) = delete;
 };

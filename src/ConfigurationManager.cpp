@@ -150,6 +150,11 @@ double CConfigurationManager::GetDouble( const char* keyName )
 	return 0.0;
 }
 
+float CConfigurationManager::GetFloat( const char* keyName )
+{
+	return static_cast<float>( GetDouble( keyName ) );
+}
+
 void CConfigurationManager::Initialize( std::string filePath )
 {
 	m_szFileName = filePath;

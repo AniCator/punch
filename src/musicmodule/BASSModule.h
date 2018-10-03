@@ -13,9 +13,10 @@ public:
 	virtual void Think();
 
 	//Playback functions
-	virtual void MusicPlay();
+	virtual void MusicPlay( bool bRestart );
 	virtual void MusicPause();
 	virtual void MusicStop();
+	virtual void MusicSpeed( float Percentage );
 
 	//Recording functions
 	virtual void RecordStart();
@@ -26,9 +27,12 @@ public:
 	virtual void MusicPlayPreviousItem();
 	virtual void MusicPlayNextItem();
 	virtual void MusicPlayItemAtIndex( unsigned int itemIndex );
+	virtual void MusicForwardTime( double Increment );
+	virtual double MusicGetPosition();
+	virtual double MusicGetLength();
 
 	//Returns FFT data array
-	virtual FFTDataArray GetFFTData();
+	virtual DataArrayFFT GetFFTData();
 
 	//Verification functions
 	virtual bool IsPlaying();
@@ -37,17 +41,19 @@ public:
 
 	float PerformAutomaticGainControl( float x );
 
-	BASS_INT iStream;
+	BASS_INT MusicStream;
 private:
 	void LoadPlugins();
 
 	void MusicLoad();
 
-	unsigned int				m_iCurrentItemIdx;
-	static float m_flReferenceVolume;
-	float m_flGain;
-	float m_flAGCReference;
-	float m_flAGCRate;
+	unsigned int CurrentItemIndex;
+	static float ReferenceVolume;
+	float ModuleGain;
+	float AGCReferenceGain;
+	float AGCRate;
 
-	FFTDataArray m_flFFTDataArray;
+	float BaseSampleRate;
+
+	DataArrayFFT DataArray;
 };

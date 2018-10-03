@@ -7,11 +7,14 @@ public:
 	VisualizationSpectrum();
 	~VisualizationSpectrum();
 
-	virtual void Think(FFTDataArray fft_data);
+	virtual void Think(DataArrayFFT fft_data);
 	virtual void Draw();
 
 	GLuint VBO;					//temp
 	std::vector<glm::vec3> points;	//temp
-	FFTDataArray m_DataOld;
-	float m_flInterpolationSpeed;
+	DataArrayFFT m_DataOld;
+	float InterpolationSpeed;
+	
+	int SpectrumBars;
+	float SpectrumHeight;
 };

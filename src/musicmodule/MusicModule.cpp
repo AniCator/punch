@@ -12,20 +12,20 @@ CMusicModule::~CMusicModule()
 
 int CMusicModule::GetSupportFlags()
 {
-	return m_eSupportFlags;
+	return SupportFlags;
 }
 
-void CMusicModule::PlaylistAddItem(std::string szItemLocation)
+void CMusicModule::PlaylistAddItem(std::wstring szItemLocation)
 {
-	m_szPlaylist.push_back(szItemLocation);
+	Playlist.push_back(szItemLocation);
 }
 
 void CMusicModule::PlaylistClear()
 {
-	m_szPlaylist.clear();
+	Playlist.clear();
 }
 
 unsigned int CMusicModule::PlaylistSize()
 {
-	return m_szPlaylist.size();
+	return Playlist.size();
 }

@@ -15,6 +15,7 @@ public:
 	const char* GetString( const char* keyName );
 	int GetInteger( const char* keyName );
 	double GetDouble( const char* keyName );
+	float GetFloat( const char* keyName );
 
 	void Initialize( std::string filePath );
 
