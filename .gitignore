@@ -159,4 +159,4 @@ $RECYCLE.BIN/
 .DS_Store
 
 # Punch specific
-Punch2.ini
+output/Punch2.ini
