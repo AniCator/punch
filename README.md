@@ -1,4 +1,4 @@
-project-gl
+Punch 2.0
 ==========
 
-Personal project to improve my OpenGL rendering skills
+Audio visualisation program.
